@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday Sania Mam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#ff5fa2; --pink2:#ff9ccc; --gold:#ffd166; --purple:#7b2ff7;
+    --deep:#1a0b2e; --text:#fff6fb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden}
+  body{
+    font-family:'Poppins',sans-serif;color:var(--text);
+    background:radial-gradient(ellipse at top,#4a1670 0%,#2a0d47 45%,var(--deep) 100%);
+  }
+  #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+
+  /* background twinkles */
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .stars span{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.2;animation:tw 3s infinite ease-in-out}
+  @keyframes tw{50%{opacity:.9;transform:scale(1.6)}}
+
+  /* screens */
+  .screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:24px 16px;text-align:center;opacity:0;visibility:hidden;transition:opacity .8s ease,visibility .8s;overflow-y:auto}
+  .screen.active{opacity:1;visibility:visible}
+
+  .btn{margin-top:28px;padding:14px 38px;border:none;border-radius:50px;cursor:pointer;
+    font:600 1.05rem 'Poppins',sans-serif;color:#2a0d47;
+    background:linear-gradient(135deg,var(--gold),var(--pink2));
+    box-shadow:0 6px 24px rgba(255,95,162,.45);transition:transform .2s, box-shadow .2s}
+  .btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 10px 30px rgba(255,95,162,.6)}
+  .btn:active{transform:scale(.97)}
+  .hidden{display:none !important}
+  .fade-in{animation:fadeUp .9s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+  /* balloons */
+  #balloons{position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden;transition:opacity .6s}
+  .balloon{position:absolute;bottom:-160px;width:60px;height:76px;border-radius:50% 50% 48% 48%/55% 55% 45% 45%;
+    animation:rise linear forwards;box-shadow:inset -8px -10px 0 rgba(0,0,0,.12)}
+  .balloon::before{content:"";position:absolute;top:12px;left:14px;width:12px;height:18px;border-radius:50%;background:rgba(255,255,255,.5)}
+  .balloon::after{content:"";position:absolute;bottom:-60px;left:50%;width:1px;height:60px;background:rgba(255,255,255,.55)}
+  .balloon i{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-bottom-color:inherit}
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) rotate(-4deg)}
+    50%{transform:translateY(-60vh) translateX(18px) rotate(4deg)}
+    100%{transform:translateY(-130vh) translateX(-10px) rotate(-3deg)}
+  }
+
+  /* title */
+  .hb{font-family:'Great Vibes',cursive;font-size:clamp(3.4rem,13vw,7.5rem);line-height:1.15;color:var(--gold);
+    text-shadow:0 0 18px rgba(255,209,102,.55),0 0 40px rgba(255,95,162,.35)}
+  .name{font-family:'Dancing Script',cursive;font-size:clamp(2.6rem,10vw,5.5rem);line-height:1.2;color:var(--pink2);
+    text-shadow:0 0 22px rgba(255,95,162,.7)}
+  .word{display:inline-block;white-space:nowrap;margin:0 .14em}
+  .ltr{display:inline-block;opacity:0;animation:letterIn .55s cubic-bezier(.2,1.6,.4,1) forwards}
+  @keyframes letterIn{from{opacity:0;transform:translateY(-40px) scale(.3) rotate(-15deg)}to{opacity:1;transform:none}}
+  @keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+
+  /* game */
+  .g-title{font-family:'Dancing Script',cursive;font-size:clamp(2rem,7vw,3rem);color:var(--gold)}
+  .g-sub{opacity:.85;margin:6px 0 20px;font-size:.95rem}
+  .board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(320px,86vw);aspect-ratio:1}
+  .cell{border:none;border-radius:16px;cursor:pointer;background:rgba(255,255,255,.1);
+    backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18);
+    font:700 clamp(2.4rem,11vw,3.4rem) 'Poppins',sans-serif;display:flex;align-items:center;justify-content:center;transition:background .2s}
+  .cell:hover:not(:disabled){background:rgba(255,255,255,.2)}
+  .cell:disabled{cursor:default}
+  .cell.x{color:var(--pink2);text-shadow:0 0 14px rgba(255,95,162,.8)}
+  .cell.o{color:var(--gold);text-shadow:0 0 14px rgba(255,209,102,.7)}
+  .cell.win{background:rgba(255,209,102,.3)}
+  .cell span{animation:pop .3s ease both}
+  .turn{margin-top:16px;min-height:1.5em;opacity:.9}
+  .result{margin-top:18px;max-width:340px}
+  .result p{font-size:1.1rem;font-weight:600}
+  .result .btn{margin-top:16px}
+
+  /* message */
+  /* greeting card (book) */
+  .card-hint{font-family:'Dancing Script',cursive;font-size:clamp(1.8rem,7vw,2.6rem);color:var(--gold);margin-bottom:22px;transition:opacity .6s}
+  .book-float{animation:bookFloat 3s ease-in-out infinite}
+  .book-float.opened{animation:none}
+  @keyframes bookFloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-14px) rotate(1.5deg)}}
+  .book{--pw:340px;--ph:420px;position:relative;width:calc(var(--pw)*2);height:var(--ph);perspective:2000px;
+    transform:translateX(-25%);transition:transform 1.3s cubic-bezier(.6,.05,.3,1)}
+  .book.open{transform:none}
+  .page,.cover{position:absolute;top:0;left:50%;width:var(--pw);height:100%}
+  .page{border-radius:0 14px 14px 0;background:linear-gradient(90deg,#efe3d6,#fffaf3 8%,#fffaf3);
+    box-shadow:0 18px 40px rgba(0,0,0,.45);display:flex;flex-direction:column;justify-content:center;padding:26px 22px 26px 28px}
+  .cover{z-index:3;transform-origin:left center;transform-style:preserve-3d;transition:transform 1.4s cubic-bezier(.6,.05,.3,1);cursor:pointer}
+  .book.open .cover{transform:rotateY(-180deg);cursor:default}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:0 14px 14px 0}
+  .front{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    background:radial-gradient(circle,rgba(255,220,240,.25) 2px,transparent 3px) 0 0/20px 20px,
+               linear-gradient(145deg,#ff6aa6,#c44dff 55%,#7b2ff7);
+    box-shadow:inset 10px 0 18px rgba(0,0,0,.2),0 18px 40px rgba(0,0,0,.45)}
+  .front::before{content:"";position:absolute;inset:14px;border:2px solid var(--gold);border-radius:8px 12px 12px 8px;
+    box-shadow:0 0 12px rgba(255,209,102,.5),inset 0 0 12px rgba(255,209,102,.3)}
+  .front .c-heart{font-size:64px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3));animation:beat 1.2s ease-in-out infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.15)}30%{transform:scale(1)}45%{transform:scale(1.1)}}
+  .front .c-title{font-family:'Great Vibes',cursive;font-size:3rem;color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,.3)}
+  .front .c-tap{font-size:.95rem;font-weight:600;color:#fff;background:rgba(0,0,0,.18);padding:6px 16px;border-radius:30px}
+  .front .corner{position:absolute;color:var(--gold);font-size:18px}
+  .back{transform:rotateY(180deg);border-radius:14px 0 0 14px;background:linear-gradient(270deg,#efe3d6,#fffaf3 8%,#fffaf3);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;
+    box-shadow:0 18px 40px rgba(0,0,0,.45)}
+  .back .l-hb{font-family:'Great Vibes',cursive;font-size:3.6rem;line-height:1.1;color:#b0105a}
+  .back .l-name{font-family:'Dancing Script',cursive;font-size:2.6rem;font-weight:700;color:#7b2ff7;margin-top:6px}
+  .back .l-deco{margin-top:14px;font-size:1.4rem;letter-spacing:6px}
+  .back .greet{transition:opacity 1s ease, transform 1s ease}
+  .back .greet.gone{opacity:0;transform:scale(.9)}
+  .back{position:absolute}
+  .polaroid{position:absolute;left:50%;top:50%;width:250px;padding:12px 12px 0;background:#fff;border-radius:3px;
+    box-shadow:0 10px 26px rgba(0,0,0,.28),0 2px 4px rgba(0,0,0,.15);
+    opacity:0;transform:translate(-50%,-46%) rotate(-4deg);transition:opacity 1.2s ease, transform 1.2s ease;pointer-events:none}
+  .polaroid.show{opacity:1;transform:translate(-50%,-50%) rotate(-4deg)}
+  .polaroid::before{content:"";position:absolute;top:-12px;left:50%;width:80px;height:24px;margin-left:-40px;
+    background:rgba(255,209,102,.55);transform:rotate(3deg);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+  .polaroid img{display:block;width:100%;height:auto;max-height:250px;object-fit:contain;background:#fff}
+  .polaroid .cap{font-family:'Dancing Script',cursive;font-weight:700;font-size:1.45rem;color:#b0105a;text-align:center;padding:10px 4px 14px;line-height:1.2}
+  .lines p{font-family:'Poppins',sans-serif;font-weight:500;font-size:1rem;line-height:1.55;margin:7px 0;color:#3a1a5c;text-align:center;
+    opacity:0;transform:translateY(12px);transition:opacity 1s, transform 1s}
+  .lines p.show{opacity:1;transform:none}
+  .lines p.last{color:#d63384;font-weight:700;margin-top:14px;padding-top:12px;border-top:1px dashed rgba(214,51,132,.4)}
+
+  /* phones: card opens top-to-bottom */
+  @media (max-width:740px){
+    .book{--pw:min(340px,90vw);--ph:min(290px,40vh);width:var(--pw);height:calc(var(--ph)*2);transform:translateY(-25%)}
+    .book.open{transform:none}
+    .page,.cover{left:0;top:50%;width:100%;height:var(--ph)}
+    .page{border-radius:0 0 14px 14px;background:linear-gradient(180deg,#efe3d6,#fffaf3 7%,#fffaf3);padding:18px 14px}
+    .cover{transform-origin:center top}
+    .book.open .cover{transform:rotateX(180deg)}
+    .face{border-radius:0 0 14px 14px}
+    .front::before{border-radius:6px 6px 12px 12px}
+    .front{box-shadow:inset 0 10px 18px rgba(0,0,0,.2),0 18px 40px rgba(0,0,0,.45)}
+    .front .c-heart{font-size:50px}
+    .front .c-title{font-size:2.4rem}
+    .back{transform:rotateX(180deg);border-radius:14px 14px 0 0;background:linear-gradient(0deg,#efe3d6,#fffaf3 7%,#fffaf3)}
+    .back .l-hb{font-size:clamp(2.4rem,11vw,3rem)}
+    .back .l-name{font-size:clamp(1.9rem,8.5vw,2.3rem)}
+    .back .l-deco{margin-top:8px}
+    .lines p{font-size:clamp(.78rem,3.5vw,.95rem);margin:4px 0;line-height:1.45}
+    .lines p.last{margin-top:8px;padding-top:8px}
+  }
+
+  /* cake */
+  .cake-wrap{display:flex;flex-direction:column;align-items:center}
+  .cake-title{font-family:'Dancing Script',cursive;font-size:clamp(1.8rem,7vw,2.6rem);color:var(--gold);margin-bottom:26px;min-height:1.4em}
+  .cake{display:flex;flex-direction:column;align-items:center}
+  .candles{display:flex;gap:26px;margin-bottom:-2px;position:relative;z-index:2}
+  .candle{position:relative;width:12px;height:52px;border-radius:3px;
+    background:repeating-linear-gradient(45deg,#fff 0 6px,var(--pink) 6px 12px)}
+  .flame{position:absolute;left:50%;bottom:54px;width:14px;height:26px;margin-left:-7px;
+    border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    background:radial-gradient(ellipse at 50% 75%,#fff 0%,#ffe08a 35%,#ff9d2e 70%,rgba(255,80,0,0) 100%);
+    box-shadow:0 0 18px 6px rgba(255,170,60,.6);transform-origin:50% 100%;animation:flicker .15s infinite alternate;transition:opacity .4s, transform .4s}
+  @keyframes flicker{from{transform:scaleY(1) rotate(-2deg)}to{transform:scaleY(1.08) rotate(2deg)}}
+  .flame.out{opacity:0;transform:scale(0);animation:none}
+  .smoke{position:absolute;left:50%;bottom:56px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:rgba(220,220,220,.6);opacity:0}
+  .smoke.go{animation:smoke 1.6s ease-out forwards}
+  @keyframes smoke{0%{opacity:.8;transform:translateY(0) scale(.6)}100%{opacity:0;transform:translateY(-70px) translateX(10px) scale(3)}}
+  .candles{margin-bottom:-6px;z-index:5}
+  .tier{position:relative;border-radius:10px 10px 5px 5px;margin-top:-3px;overflow:visible;
+    box-shadow:inset -16px 0 20px rgba(0,0,0,.18),inset 12px 0 16px rgba(255,255,255,.28)}
+  .tier .drip{position:absolute;top:-1px;left:-2px;width:calc(100% + 4px);height:32px;z-index:2;
+    filter:drop-shadow(0 2px 1px rgba(0,0,0,.12))}
+  .tier::after{content:"";position:absolute;left:4px;right:4px;bottom:-4px;height:11px;z-index:3;
+    background:radial-gradient(circle at 50% 50%,#fff 3px,#f1d4e6 4.5px,transparent 5.5px) 0 0/12px 11px repeat-x}
+  .t1{width:140px;height:58px;z-index:3;background:linear-gradient(90deg,#ff6aa6,#ffb3d1 40%,#ff7eb3 70%,#e8508f)}
+  .t2{width:204px;height:68px;z-index:2;background:linear-gradient(90deg,#f3e3d3,#fff8ef 40%,#fbeee0 70%,#e8d3bf)}
+  .t3{width:264px;height:80px;z-index:1;background:linear-gradient(90deg,#8a4ee8,#c49bff 40%,#a873ff 70%,#7a3cdc)}
+  .rosettes{position:absolute;top:-10px;left:4px;right:4px;height:18px;z-index:4;
+    background:radial-gradient(circle at 50% 60%,#fff 4px,#ffe1ee 6px,#ffc2dc 7px,transparent 8px) 0 0/17px 18px repeat-x}
+  .hearts{position:absolute;left:0;right:0;bottom:16px;z-index:3;color:#ff5fa2;font-size:15px;letter-spacing:12px;text-indent:12px}
+  .cherry{position:absolute;top:-14px;width:14px;height:14px;border-radius:50%;z-index:5;
+    background:radial-gradient(circle at 35% 35%,#ff8a8a,#e0102f 60%,#8a0016)}
+  .sprinkle{position:absolute;width:9px;height:3px;border-radius:2px;z-index:3}
+  .stand{position:relative;width:300px;height:18px;border-radius:50%;margin-top:-8px;z-index:0;
+    background:linear-gradient(#ffffff,#e6d4f2);box-shadow:0 5px 0 #c4a9dc,0 18px 30px rgba(0,0,0,.4)}
+  .stand::after{content:"";position:absolute;left:50%;top:20px;width:80px;height:34px;margin-left:-40px;
+    background:linear-gradient(90deg,#c4a9dc,#fff 45%,#d8c4ea);clip-path:polygon(32% 0,68% 0,100% 100%,0 100%);border-radius:0 0 8px 8px}
+  .cake{margin-bottom:34px}
+
+  /* memory game */
+  .mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:min(500px,62vh,92vw)}
+  .tile{aspect-ratio:1;border:none;padding:0;background:none;cursor:pointer;perspective:800px}
+  .tile-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s ease}
+  .tile.flipped .tile-in{transform:rotateY(180deg)}
+  .t-face{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+  .t-back{display:flex;align-items:center;justify-content:center;font-size:clamp(1.4rem,4vw,2rem);
+    background:radial-gradient(circle,rgba(255,220,240,.25) 2px,transparent 3px) 0 0/14px 14px,linear-gradient(145deg,#ff6aa6,#c44dff 55%,#7b2ff7);
+    border:2px solid var(--gold);box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 0 10px rgba(255,209,102,.35)}
+  .tile:hover:not(.flipped) .t-back{filter:brightness(1.12)}
+  .t-front{transform:rotateY(180deg);background:#fff;border:3px solid #fff;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+  .t-front img{width:100%;height:100%;object-fit:cover;display:block;border-radius:9px}
+  .tile.matched{cursor:default}
+  .tile.matched .t-front{border-color:var(--gold);box-shadow:0 0 18px rgba(255,209,102,.75)}
+  #memResult p{font-size:1.3rem}
+
+  /* gift */
+  .gift-hint{font-family:'Dancing Script',cursive;font-size:clamp(1.8rem,7vw,2.6rem);color:var(--gold);margin-bottom:34px}
+  .gift-stage{position:relative;width:240px;height:250px;display:flex;align-items:flex-end;justify-content:center}
+  .gift-glow{position:absolute;inset:-20px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(255,209,102,.45),rgba(255,95,162,.18) 45%,transparent 70%);
+    animation:glow 1.8s ease-in-out infinite alternate}
+  @keyframes glow{from{opacity:.6;transform:scale(.92)}to{opacity:1;transform:scale(1.05)}}
+  .rays{position:absolute;left:50%;top:50%;width:460px;height:460px;margin:-230px 0 0 -230px;border-radius:50%;pointer-events:none;opacity:0;
+    background:repeating-conic-gradient(rgba(255,209,102,.4) 0 8deg,transparent 8deg 20deg);
+    -webkit-mask:radial-gradient(circle,#000 10%,transparent 68%);mask:radial-gradient(circle,#000 10%,transparent 68%);transition:opacity .6s}
+  .gift-stage.open .rays{opacity:1;animation:spin 8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .twk{position:absolute;color:var(--gold);font-size:20px;animation:tw 1.6s infinite ease-in-out;text-shadow:0 0 10px var(--gold)}
+  .gift{position:relative;width:190px;height:200px;cursor:pointer;animation:floaty 3s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}20%{transform:translateY(-12px)}40%{transform:translateY(0)}
+    50%{transform:rotate(-5deg)}58%{transform:rotate(5deg)}66%{transform:rotate(-3deg)}72%{transform:rotate(0)}}
+  .gift .box{position:absolute;bottom:0;left:12px;width:166px;height:130px;border-radius:8px;
+    background:radial-gradient(circle,rgba(255,215,240,.55) 2.5px,transparent 3.5px) 0 0/22px 22px,
+               linear-gradient(135deg,#7f2bea,#c44dff 50%,#6512c4);
+    box-shadow:inset -18px -10px 24px rgba(0,0,0,.25),inset 10px 0 16px rgba(255,255,255,.18),0 16px 34px rgba(0,0,0,.45)}
+  .ribbon-v{position:absolute;left:50%;top:0;bottom:0;width:32px;margin-left:-16px;
+    background:linear-gradient(90deg,#b0105a,#ff8fc1 28%,#ffe6f2 50%,#ff8fc1 72%,#b0105a)}
+  .ribbon-h{position:absolute;left:0;right:0;top:50%;height:22px;margin-top:-11px;
+    background:linear-gradient(#b0105a,#ff8fc1 28%,#ffe6f2 50%,#ff8fc1 72%,#b0105a)}
+  .gift .lid{position:absolute;top:34px;left:0;width:190px;height:42px;border-radius:8px;z-index:2;
+    background:radial-gradient(circle,rgba(255,215,240,.55) 2.5px,transparent 3.5px) 0 0/22px 22px,
+               linear-gradient(135deg,#9440ff,#d466ff 50%,#7a22e0);
+    box-shadow:inset 0 -6px 10px rgba(0,0,0,.2),0 8px 12px rgba(0,0,0,.3);
+    transition:transform 1s cubic-bezier(.3,1.4,.5,1), opacity 1s}
+  .bow{position:absolute;top:-38px;left:50%;width:120px;height:56px;margin-left:-60px}
+  .loop{position:absolute;top:4px;width:56px;height:40px;border-radius:50%;
+    background:radial-gradient(ellipse at 50% 50%,transparent 26%,#ffd6ea 30%,#ff6aa6 62%,#a80d55 100%);
+    box-shadow:0 3px 6px rgba(0,0,0,.25)}
+  .loop.l{left:2px;transform:rotate(-20deg)}
+  .loop.r{right:2px;transform:rotate(20deg)}
+  .tail{position:absolute;top:30px;width:16px;height:40px;background:linear-gradient(#ff8fc1,#b0105a);
+    clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%)}
+  .tail.l{left:42px;transform:rotate(28deg)}
+  .tail.r{right:42px;transform:rotate(-28deg)}
+  .knot{position:absolute;left:50%;top:14px;width:26px;height:26px;margin-left:-13px;border-radius:50%;z-index:2;
+    background:radial-gradient(circle at 35% 35%,#fff0f7,#ff5fa2 60%,#a80d55);box-shadow:0 2px 5px rgba(0,0,0,.3)}
+  .gift-stage.open .gift{animation:none}
+  .gift-stage.open .lid{transform:translateY(-180px) rotate(-35deg);opacity:0}
+
+  /* gallery */
+  .gal-title{font-family:'Great Vibes',cursive;font-size:clamp(2.4rem,9vw,3.8rem);color:var(--gold);margin-bottom:22px}
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,2.5vw,20px);width:min(900px,100%)}
+  .photo{position:relative;aspect-ratio:3/4;border-radius:14px;overflow:hidden;cursor:zoom-in;
+    background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.85);box-shadow:0 10px 28px rgba(0,0,0,.4);
+    opacity:0;animation:fadeUp .8s ease forwards;transition:transform .25s}
+  .photo:nth-child(2){animation-delay:.25s}.photo:nth-child(3){animation-delay:.5s}
+  .photo:hover{transform:scale(1.04) rotate(-1deg)}
+  .photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .photo .ph{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:6px;
+    font-size:clamp(.7rem,2.6vw,.95rem);opacity:.8;padding:6px}
+  .photo.missing img{display:none}.photo.missing .ph{display:flex}
+  .gal-foot{margin-top:24px;font-family:'Dancing Script',cursive;font-size:clamp(1.4rem,5vw,2rem);color:var(--pink2)}
+
+  /* lightbox */
+  .lightbox{position:fixed;inset:0;z-index:100;background:rgba(10,3,20,.92);display:flex;align-items:center;justify-content:center;
+    padding:16px;opacity:0;visibility:hidden;transition:opacity .35s, visibility .35s}
+  .lightbox.open{opacity:1;visibility:visible}
+  .lightbox img{max-width:100%;max-height:88vh;border-radius:12px;box-shadow:0 0 40px rgba(255,95,162,.4);transform:scale(.9);transition:transform .35s}
+  .lightbox.open img{transform:scale(1)}
+  .lb-close{position:absolute;top:14px;right:16px;width:46px;height:46px;border:none;border-radius:50%;cursor:pointer;
+    background:rgba(255,255,255,.15);color:#fff;font-size:1.7rem;line-height:1}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<canvas id="fx"></canvas>
+<div id="balloons"></div>
+
+<!-- 1. Title -->
+<section class="screen" id="s-title">
+  <div class="hb" id="hbText"></div>
+  <div class="name" id="hbName"></div>
+  <button class="btn hidden" id="titleNext" onclick="go('s-game')">Next ➜</button>
+</section>
+
+<!-- 2. Tic Tac Toe -->
+<section class="screen" id="s-game">
+  <div class="g-title">A little game first! 🎮</div>
+  <p class="g-sub">Win this Tic Tac Toe to unlock your surprise. You are <b style="color:var(--pink2)">X</b>, you go first!</p>
+  <div class="board" id="board"></div>
+  <div class="turn" id="turn">Your turn 💖</div>
+  <div class="result hidden" id="result">
+    <p id="resultText"></p>
+    <button class="btn" id="resultBtn"></button>
+  </div>
+</section>
+
+<!-- 3. Message -->
+<section class="screen" id="s-msg">
+  <div class="card-hint" id="cardHint">A card for you 💌</div>
+  <div class="book-float" id="bookFloat">
+    <div class="book" id="book">
+      <div class="page">
+        <div class="lines">
+          <p>Khushiyon se saje apka har ek mukam</p>
+          <p>Phulon sa mehke apka har ek paigaam</p>
+          <p>Apki muskan yun hi raushan rahe har sham</p>
+          <p>Apki zindagi me barse khushiyan tamaam</p>
+          <p>Dua hai har Khawab apka hakikat ban jaye</p>
+          <p class="last">Sania Mam. Janamdin apka har saal or bhi khas bann jaye</p>
+        </div>
+      </div>
+      <div class="cover" id="cover">
+        <div class="face front">
+          <span class="corner" style="top:22px;left:24px">✦</span><span class="corner" style="top:22px;right:24px">✦</span>
+          <span class="corner" style="bottom:22px;left:24px">✦</span><span class="corner" style="bottom:22px;right:24px">✦</span>
+          <div class="c-heart">💝</div>
+          <div class="c-title">For You</div>
+          <div class="c-tap">Tap to open 💌</div>
+        </div>
+        <div class="face back">
+          <div class="greet" id="greet">
+            <div class="l-hb">Happy Birthday</div>
+            <div class="l-name">Sania Mam</div>
+            <div class="l-deco">💐🎂💖</div>
+          </div>
+          <div class="polaroid" id="polaroid">
+            <img src="mam.jpeg" alt="Sania Mam">
+            <div class="cap">Happy Birthday Sania Mam 💖</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn hidden" id="msgNext" onclick="go('s-cake')">Next ➜</button>
+</section>
+
+<!-- 4. Cake -->
+<section class="screen" id="s-cake">
+  <div class="cake-wrap">
+    <div class="cake-title" id="cakeTitle">Make a wish... 🎂</div>
+    <div class="cake">
+      <div class="candles">
+        <div class="candle"><div class="flame"></div><div class="smoke"></div></div>
+        <div class="candle"><div class="flame"></div><div class="smoke"></div></div>
+        <div class="candle"><div class="flame"></div><div class="smoke"></div></div>
+      </div>
+      <div class="tier t1" data-drip="#ffffff"><div class="rosettes"></div></div>
+      <div class="tier t2" data-drip="#ff8fc1"><div class="hearts">♥♥♥♥♥♥♥</div>
+        <span class="cherry" style="left:14px"></span><span class="cherry" style="right:14px"></span></div>
+      <div class="tier t3" data-drip="#fff4fb"></div>
+      <div class="stand"></div>
+    </div>
+    <button class="btn" id="blowBtn">Blow the Candle 🕯️</button>
+    <button class="btn hidden" id="cakeNext" onclick="go('s-memory')">Next ➜</button>
+  </div>
+</section>
+
+<!-- 4b. Memory game -->
+<section class="screen" id="s-memory">
+  <div class="g-title">One last game before your gift! 🎁</div>
+  <p class="g-sub">Flip two tiles at a time and match all the pairs of photos 💖</p>
+  <div class="mem-grid" id="memGrid"></div>
+  <div class="result hidden" id="memResult">
+    <p>You did it! 🎉🥳</p>
+    <button class="btn" onclick="go('s-gift')">Next ➜</button>
+  </div>
+</section>
+
+<!-- 5. Gift -->
+<section class="screen" id="s-gift">
+  <div class="gift-hint">A gift for you! Tap to open 🎁</div>
+  <div class="gift-stage" id="giftStage">
+    <div class="rays"></div>
+    <div class="gift-glow"></div>
+    <span class="twk" style="left:2px;top:40px">✦</span>
+    <span class="twk" style="right:6px;top:20px;animation-delay:.5s">✦</span>
+    <span class="twk" style="left:20px;bottom:30px;animation-delay:1s;font-size:14px">✦</span>
+    <span class="twk" style="right:0;bottom:60px;animation-delay:.8s;font-size:16px">✦</span>
+    <div class="gift" id="gift">
+      <div class="lid"><div class="ribbon-v"></div>
+        <div class="bow"><div class="tail l"></div><div class="tail r"></div><div class="loop l"></div><div class="loop r"></div><div class="knot"></div></div>
+      </div>
+      <div class="box"><div class="ribbon-h"></div><div class="ribbon-v"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Pictures -->
+<section class="screen" id="s-gallery">
+  <div class="gal-title">Beautiful Moments 💕</div>
+  <div class="gallery" id="gallery">
+    <div class="photo"><img src="bd1.jpeg" alt="Memory 1"><div class="ph">📷<span>bd1.jpeg</span></div></div>
+    <div class="photo"><img src="bd2.jpeg" alt="Memory 2"><div class="ph">📷<span>bd2.jpeg</span></div></div>
+    <div class="photo"><img src="bd3.jpeg" alt="Memory 3"><div class="ph">📷<span>bd3.jpeg</span></div></div>
+  </div>
+  <div class="gal-foot">Happy Birthday Sania Mam 💖</div>
+</section>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Close">×</button>
+  <img id="lbImg" alt="">
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const rand = (a,b) => a + Math.random()*(b-a);
+const COLORS = ['#ff5fa2','#ffd166','#7bdff2','#b2f7ef','#c77dff','#ff9ccc','#ffffff','#06d6a0'];
+let current = null;
+function go(id){
+  if(current) $(current).classList.remove('active');
+  $(id).classList.add('active'); current = id;
+  if(id==='s-title') typeTitle();
+  if(id==='s-game') resetGame();
+  if(id==='s-memory') buildMemory();
+}
+
+/* background stars */
+for(let i=0;i<60;i++){
+  const s=document.createElement('span');
+  s.style.left=rand(0,100)+'%'; s.style.top=rand(0,100)+'%';
+  s.style.animationDelay=rand(0,3)+'s';
+  $('stars').appendChild(s);
+}
+
+/* ---------- particle effects ---------- */
+const cv=$('fx'), cx=cv.getContext('2d');
+let W,H,dpr, parts=[];
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0)}
+resize(); addEventListener('resize',resize);
+
+function burst(x,y,n,angle,spread,speed){
+  for(let i=0;i<n;i++){
+    const a=(angle+rand(-spread,spread))*Math.PI/180, v=rand(speed*.5,speed);
+    parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:.18,size:rand(5,10),color:COLORS[i%COLORS.length],
+      rot:rand(0,6.28),vr:rand(-.2,.2),shape:['rect','circle','star'][i%3],life:1,decay:rand(.004,.009)});
+  }
+}
+function sparkle(n){
+  for(let i=0;i<n;i++) parts.push({x:rand(0,W),y:rand(0,H*.85),vx:0,vy:rand(-.3,.3),g:0,size:rand(4,9),
+    color:Math.random()<.5?'#ffd166':'#ffffff',rot:0,vr:.05,shape:'star',life:1,decay:rand(.015,.03),twinkle:true});
+}
+function rain(n){
+  for(let i=0;i<n;i++) parts.push({x:rand(0,W),y:rand(-H*.5,-10),vx:rand(-1,1),vy:rand(1,3),g:.03,size:rand(5,9),
+    color:COLORS[i%COLORS.length],rot:rand(0,6),vr:rand(-.15,.15),shape:i%2?'rect':'circle',life:1,decay:.0025});
+}
+function star(r){cx.beginPath();for(let i=0;i<10;i++){const rr=i%2?r*.45:r,a=i*Math.PI/5-Math.PI/2;cx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}cx.closePath();cx.fill()}
+function loop(){
+  cx.clearRect(0,0,W,H);
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];
+    p.vx*=.99; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life-=p.decay;
+    if(p.life<=0||p.y>H+40){parts.splice(i,1);continue}
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot);
+    cx.globalAlpha=p.twinkle?Math.sin(p.life*Math.PI):Math.min(1,p.life*2);
+    cx.fillStyle=p.color;
+    if(p.twinkle){cx.shadowColor=p.color;cx.shadowBlur=12}
+    if(p.shape==='rect') cx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+    else if(p.shape==='circle'){cx.beginPath();cx.arc(0,0,p.size/2.5,0,6.28);cx.fill()}
+    else star(p.size/1.6);
+    cx.restore();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+function poppers(){
+  burst(0,H,90,-60,22,17); burst(W,H,90,-120,22,17);
+}
+function celebrate(){
+  poppers(); burst(W/2,H*.4,120,-90,180,12); sparkle(30);
+}
+
+/* ---------- 1. opening show ---------- */
+function balloons(){
+  const box=$('balloons');
+  for(let i=0;i<22;i++){
+    const b=document.createElement('div'); b.className='balloon';
+    const c=COLORS[i%6]; b.style.background=c; b.style.borderBottomColor=c;
+    b.innerHTML='<i></i>';
+    b.style.left=rand(-3,95)+'%';
+    const sc=rand(.7,1.25); b.style.width=60*sc+'px'; b.style.height=76*sc+'px';
+    b.style.animationDuration=rand(2.6,3.6)+'s';
+    b.style.animationDelay=rand(0,.8)+'s';
+    box.appendChild(b);
+  }
+}
+function opening(){
+  balloons(); poppers();
+  let t=0;
+  const iv=setInterval(()=>{
+    t++; sparkle(14);
+    if(t%4===0) poppers();
+    if(t%3===0) burst(rand(W*.2,W*.8),rand(H*.15,H*.45),50,-90,180,9);
+  },250);
+  setTimeout(()=>{
+    clearInterval(iv);
+    $('balloons').style.opacity=0;
+    setTimeout(()=>{$('balloons').innerHTML=''},700);
+    go('s-title'); rain(80); sparkle(25);
+  },3200);
+}
+addEventListener('load',opening);
+
+/* title appears letter by letter */
+let titleTyped=false;
+function typeTitle(){
+  if(titleTyped) return; titleTyped=true;
+  let n=0; const STEP=120;
+  function fill(el,text){
+    text.split(' ').forEach(w=>{
+      const word=document.createElement('span'); word.className='word';
+      [...w].forEach(ch=>{
+        const s=document.createElement('span'); s.className='ltr'; s.textContent=ch;
+        s.style.animationDelay=(n*STEP)+'ms';
+        const k=n; setTimeout(()=>sparkle(3),k*STEP);
+        n++; word.appendChild(s);
+      });
+      el.appendChild(word); n++;
+    });
+  }
+  fill($('hbText'),'Happy Birthday');
+  n+=2;
+  fill($('hbName'),'Sania Mam');
+  setTimeout(()=>{
+    burst(W/2,H*.35,120,-90,180,11);
+    const b=$('titleNext'); b.classList.remove('hidden'); b.classList.add('fade-in');
+  },n*STEP+500);
+}
+
+/* ---------- 2. tic tac toe (easy) ---------- */
+const LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board, locked;
+const cells=[];
+for(let i=0;i<9;i++){
+  const c=document.createElement('button'); c.className='cell';
+  c.onclick=()=>play(i); $('board').appendChild(c); cells.push(c);
+}
+function resetGame(){
+  board=Array(9).fill(''); locked=false;
+  cells.forEach(c=>{c.className='cell';c.innerHTML='';c.disabled=false});
+  $('result').classList.add('hidden'); $('turn').textContent='Your turn 💖';
+}
+function winner(b){
+  for(const l of LINES){const [a,c,d]=l;if(b[a]&&b[a]===b[c]&&b[a]===b[d])return{who:b[a],line:l}}
+  return b.every(Boolean)?{who:'draw'}:null;
+}
+function mark(i,who){
+  board[i]=who; cells[i].classList.add(who.toLowerCase());
+  cells[i].innerHTML='<span>'+who+'</span>'; cells[i].disabled=true;
+}
+function play(i){
+  if(locked||board[i]) return;
+  mark(i,'X');
+  if(finish()) return;
+  locked=true; $('turn').textContent='Thinking... 🤔';
+  setTimeout(()=>{aiMove(); if(!finish()){locked=false;$('turn').textContent='Your turn 💖'}},550);
+}
+function aiMove(){
+  const free=board.map((v,i)=>v?null:i).filter(v=>v!==null);
+  // moderate: always wins if it can, usually blocks, likes the center, otherwise random
+  const finds=who=>{for(const i of free){board[i]=who;const w=winner(board);board[i]='';if(w&&w.who===who)return i}return -1};
+  let m=finds('O');
+  if(m<0&&Math.random()<0.75) m=finds('X');
+  if(m<0&&!board[4]&&Math.random()<0.6) m=4;
+  if(m<0){
+    const corners=[0,2,6,8].filter(i=>!board[i]);
+    m=(corners.length&&Math.random()<0.5)?corners[Math.floor(Math.random()*corners.length)]:free[Math.floor(Math.random()*free.length)];
+  }
+  mark(m,'O');
+}
+function finish(){
+  const w=winner(board); if(!w) return false;
+  locked=true; cells.forEach(c=>c.disabled=true); $('turn').textContent='';
+  const btn=$('resultBtn');
+  if(w.who==='X'){
+    w.line.forEach(i=>cells[i].classList.add('win'));
+    $('resultText').textContent='You won! 🎉🥳';
+    btn.textContent='Next ➜'; btn.onclick=()=>go('s-msg');
+    celebrate();
+  }else{
+    $('resultText').textContent='Oops, sorry! 😅 You have to win the game to reveal your gift 🎁';
+    btn.textContent='Try Again 🔄'; btn.onclick=resetGame;
+  }
+  setTimeout(()=>$('result').classList.remove('hidden'),400);
+  return true;
+}
+
+/* ---------- 3. message ---------- */
+let poemPlayed=false;
+function playPoem(){
+  if(poemPlayed) return; poemPlayed=true;
+  const lines=document.querySelectorAll('.lines p');
+  // lines 1-3, then greeting swaps to polaroid photo, then lines 4-6
+  const PAUSE=2600;
+  const at=i=>1500+i*1300+(i>=3?PAUSE:0);
+  lines.forEach((p,i)=>setTimeout(()=>p.classList.add('show'),at(i)));
+  setTimeout(()=>$('greet').classList.add('gone'),at(2)+1100);
+  setTimeout(()=>{$('polaroid').classList.add('show');sparkle(18)},at(2)+1900);
+  setTimeout(()=>{$('msgNext').classList.remove('hidden');$('msgNext').classList.add('fade-in');sparkle(20)},at(lines.length-1)+1700);
+}
+$('cover').onclick=function(){
+  if($('book').classList.contains('open')) return;
+  $('bookFloat').classList.add('opened');
+  $('book').classList.add('open');
+  $('cardHint').style.opacity=0;
+  setTimeout(()=>sparkle(25),900);
+  playPoem();
+};
+
+/* ---------- 4. cake ---------- */
+document.querySelectorAll('.tier').forEach(t=>{
+  const w=200, base=9;
+  let d=`M0 0 H${w} V${base}`, x=w;
+  while(x>0){
+    const seg=Math.min(rand(14,24),x), len=rand(3,20), nx=x-seg, mid=x-seg/2;
+    d+=` C${x} ${base} ${x-seg*.2} ${base+len} ${mid} ${base+len} C${nx+seg*.2} ${base+len} ${nx} ${base} ${nx} ${base}`;
+    x=nx;
+  }
+  d+=' Z';
+  t.insertAdjacentHTML('afterbegin',`<svg class="drip" viewBox="0 0 200 32" preserveAspectRatio="none"><path d="${d}" fill="${t.dataset.drip}"/></svg>`);
+});
+(function(){
+  const t3=document.querySelector('.t3');
+  for(let i=0;i<34;i++){
+    const s=document.createElement('span'); s.className='sprinkle';
+    s.style.left=rand(4,94)+'%'; s.style.top=rand(38,78)+'%';
+    s.style.background=COLORS[i%COLORS.length]; s.style.transform=`rotate(${rand(0,180)}deg)`;
+    t3.appendChild(s);
+  }
+})();
+$('blowBtn').onclick=function(){
+  this.classList.add('hidden');
+  document.querySelectorAll('.flame').forEach((f,i)=>setTimeout(()=>f.classList.add('out'),i*180));
+  document.querySelectorAll('.smoke').forEach((s,i)=>setTimeout(()=>s.classList.add('go'),i*180+200));
+  setTimeout(()=>{$('cakeTitle').textContent='Yay! 🎉 Your wish is on its way ✨';celebrate()},900);
+  setTimeout(()=>{const b=$('cakeNext');b.classList.remove('hidden');b.classList.add('fade-in')},2200);
+};
+
+/* ---------- 4b. memory game ---------- */
+const memGrid=$('memGrid');
+let memFirst=null, memBusy=false, memMatched=0;
+function buildMemory(){
+  memGrid.innerHTML=''; memFirst=null; memBusy=false; memMatched=0;
+  $('memResult').classList.add('hidden');
+  const ids=[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8];
+  for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}
+  ids.forEach(id=>{
+    const t=document.createElement('button'); t.className='tile'; t.dataset.id=id;
+    t.innerHTML=`<div class="tile-in"><div class="t-face t-back">💖</div><div class="t-face t-front"><img src="m${id}.jpeg" alt=""></div></div>`;
+    t.onclick=()=>flipTile(t);
+    memGrid.appendChild(t);
+  });
+}
+function flipTile(t){
+  if(memBusy||t.classList.contains('flipped')) return;
+  t.classList.add('flipped');
+  if(!memFirst){memFirst=t;return}
+  const a=memFirst; memFirst=null;
+  if(a.dataset.id===t.dataset.id){
+    a.classList.add('matched'); t.classList.add('matched');
+    [a,t].forEach(el=>{const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,24,-90,180,6)});
+    memMatched++;
+    if(memMatched===8) setTimeout(memWin,700);
+  }else{
+    memBusy=true;
+    setTimeout(()=>{a.classList.remove('flipped');t.classList.remove('flipped');memBusy=false},1000);
+  }
+}
+function memWin(){
+  celebrate();
+  const r=$('memResult'); r.classList.remove('hidden');
+}
+
+/* ---------- 5. gift ---------- */
+$('gift').onclick=function(){
+  const stage=$('giftStage');
+  if(stage.classList.contains('open')) return;
+  stage.classList.add('open');
+  const r=this.getBoundingClientRect();
+  burst(r.left+r.width/2,r.top+r.height/2,160,-90,70,16); sparkle(30);
+  setTimeout(()=>{go('s-gallery');rain(70)},1300);
+};
+
+/* ---------- 6. gallery + lightbox ---------- */
+document.querySelectorAll('.photo').forEach(ph=>{
+  const img=ph.querySelector('img');
+  img.addEventListener('error',()=>ph.classList.add('missing'));
+  if(img.complete&&img.naturalWidth===0) ph.classList.add('missing');
+  ph.onclick=()=>{
+    if(ph.classList.contains('missing')) return;
+    $('lbImg').src=img.src; $('lightbox').classList.add('open');
+  };
+});
+function closeLb(){$('lightbox').classList.remove('open')}
+$('lbClose').onclick=closeLb;
+$('lightbox').onclick=e=>{if(e.target.id==='lightbox')closeLb()};
+addEventListener('keydown',e=>{if(e.key==='Escape')closeLb()});
+</script>
+</body>
+</html>
